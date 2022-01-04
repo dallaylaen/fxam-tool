@@ -1,0 +1,7 @@
+.*.sw[pon]
+.nyc*
+coverage
+node_modules
+out
+*.skip
+*.skip.*

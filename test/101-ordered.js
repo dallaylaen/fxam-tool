@@ -31,6 +31,11 @@ describe( 'Ordered', () => {
         o.set( { id: 137, replace:true } );
         expect( o.list() ).to.deep.equal( [ { id: 137, replace:true }, zzz, qux ] );
 
+        expect( o.get(foo.id) ).to.equal( undefined );
+        expect( o.get(zzz.id) ).to.deep.equal( zzz );
+        expect( o.get(bar.id) ).to.deep.equal( { id: 137, replace:true } );
+
+
         done();
     });
 });

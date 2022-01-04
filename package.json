@@ -1,0 +1,16 @@
+{
+  "name": "fxam",
+  "version": "1.0.0",
+  "description": "Feature x Artifact Matrix - estimation & road mapping tool",
+  "main": "lib/index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "nyc mocha"
+  },
+  "author": "",
+  "license": "MIT"
+}

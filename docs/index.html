@@ -1,0 +1,78 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Feature x Artifact Matrix (FXAM) - a roadmapping and estimation tool</title>
+</head>
+<body>
+<div id="badarea"></div>
+<h1>FXAM</h1>
+<table id="matrix">
+    <tr id="arts">
+        <th><a href="#" onclick="return addArtifact()">add art...</a><br>
+        <a href="#" onclick="return addFeature()">add feat...</a></th>
+    </tr>
+    <tbody id="feats">
+    </tbody>
+</table>
+<script>
+const out = document.getElementById('badarea');
+window.onerror = function(err) {
+    console.log(err);
+    out.innerHTML = '<pre>'+err.stack+'</pre>'+'<button>dismiss</button>';
+    out.children[1].onclick = function() {
+        out.innerHTML = '';
+    };
+}
+</script>
+<script src="js/fxam.js"></script>
+<script>
+    const project = new Project;
+
+    const table = document.getElementById('matrix');
+    const thead = document.getElementById('arts');
+    const rows  = document.getElementById('feats');
+
+    function addArtifact() {
+        const art = project.addArtifact({ name: '...' });
+        art.elem = document.createElement( 'th', {id:'art_'+art.id} );
+        thead.appendChild( art.elem );
+        const list = rows.children;
+        const feats = project.features.list();
+        for( let i=0; i<list.length; i++) {
+            const cell = document.createElement('td', );
+            list[i].appendChild(cell);
+        }
+        saveArtifact( art );
+    };
+
+    function showCell(x, y) {
+        const row = rows.children[y];
+        const td = row.children[x+1]; // skip th
+        // TODO check it exists
+
+        const art  = project.artifacts.nth(x);
+        const feat = project.features.nth(y);
+
+        // TODO better
+        td.innerHTML='<checkbox id="x_'+art.id+'_'+feat.id+'">';
+        
+        const box = td.children[0];
+        box.checked = art.hasFeature(feat);
+        box.onclick = function() {
+        };
+    };
+
+    function saveArtifact(art) {
+        const col = project.indexOf(art);
+        if (col === -1)
+            throw new Error('foo bared');
+        
+    };
+
+    function addFeature() {
+    };
+
+</script>
+</body>
+</html>
+

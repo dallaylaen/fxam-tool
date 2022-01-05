@@ -11,7 +11,10 @@ describe( 'Ordered', () => {
 
     it( 'can add, move, and delete items', done => {
         const o = new Ordered();
+        expect( o.length() ).to.equal( 0 );
+
         expect( o.set( foo ) ).to.equal( o );
+        expect( o.length() ).to.equal( 1 );
         o.set( bar );
         o.set( qux );
         expect( o.list() ).to.deep.equal( [ foo, bar, qux ] );
@@ -42,6 +45,7 @@ describe( 'Ordered', () => {
 
         expect( o.nth(2) ).to.equal( qux );
         expect( o.nth(1) ).to.equal( zzz );
+        expect( o.length() ).to.equal( 3 );
 
         done();
     });

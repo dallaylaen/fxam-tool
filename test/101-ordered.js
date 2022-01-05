@@ -39,7 +39,9 @@ describe( 'Ordered', () => {
         expect( o.indexOf(bar) ).to.equal( -1 );
         expect( o.indexOf(foo) ).to.equal( -1 );
         expect( o.indexOf(zzz) ).to.equal( 1 );
-        
+
+        expect( o.nth(2) ).to.equal( qux );
+        expect( o.nth(1) ).to.equal( zzz );
 
         done();
     });

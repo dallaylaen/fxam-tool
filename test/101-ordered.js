@@ -36,6 +36,11 @@ describe( 'Ordered', () => {
         expect( o.get(bar.id) ).to.deep.equal( { id: 137, replace:true } );
 
 
+        expect( o.indexOf(bar) ).to.equal( -1 );
+        expect( o.indexOf(foo) ).to.equal( -1 );
+        expect( o.indexOf(zzz) ).to.equal( 1 );
+        
+
         done();
     });
 });

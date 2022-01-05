@@ -6,7 +6,7 @@
 <body>
 <div id="badarea"></div>
 <h1>FXAM</h1>
-<table id="matrix">
+<table id="matrix" border="1">
     <tr id="arts">
         <th><a href="#" onclick="return addArtifact()">add art...</a><br>
         <a href="#" onclick="return addFeature()">add feat...</a></th>
@@ -17,8 +17,7 @@
 <script>
 const out = document.getElementById('badarea');
 window.onerror = function(err) {
-    console.log(err);
-    out.innerHTML = '<pre>'+err.stack+'</pre>'+'<button>dismiss</button>';
+    out.innerHTML = '<pre>'+err+'</pre>'+'<button>dismiss</button>';
     out.children[1].onclick = function() {
         out.innerHTML = '';
     };
@@ -33,7 +32,7 @@ window.onerror = function(err) {
     const rows  = document.getElementById('feats');
 
     function addArtifact() {
-        const art = project.addArtifact({ name: '...' });
+        const art = project.addArtifact();
         art.elem = document.createElement( 'th', {id:'art_'+art.id} );
         thead.appendChild( art.elem );
         const list = rows.children;
@@ -42,7 +41,41 @@ window.onerror = function(err) {
             const cell = document.createElement('td', );
             list[i].appendChild(cell);
         }
-        saveArtifact( art );
+        updateArtifact( art );
+    };
+
+    function addFeature() {
+        const feat = project.addFeature();
+        feat.elem = document.createElement( 'tr', {id:'feat_'+feat.id} );
+        rows.appendChild( feat.elem );
+        feat.elem.appendChild(document.createElement('th'));
+
+        const arts = project.artifacts.list();
+        for( let i=0; i<arts.length; i++) {
+            const cell = document.createElement('td', );
+            feat.elem.appendChild(cell);
+        }
+        updateFeature(feat);
+    };
+
+    function updateFeature(feat) {
+        const n = project.indexOf(feat);
+        const th = rows.children[n].children[0];
+
+        th.innerHTML = feat.name;
+
+        for( let m = 0; m<project.artifacts.length(); m++)
+            showCell( m, n );
+    };
+
+    function updateArtifact(art) {
+        const col = project.indexOf(art);
+        if (col === -1)
+            throw new Error('foo bared');
+        thead.children[col+1].innerHTML = art.name;
+
+        for( let row = 0; row<project.features.length(); row++)
+            showCell( col, row );
     };
 
     function showCell(x, y) {
@@ -54,23 +87,17 @@ window.onerror = function(err) {
         const feat = project.features.nth(y);
 
         // TODO better
-        td.innerHTML='<checkbox id="x_'+art.id+'_'+feat.id+'">';
+        td.innerHTML='<input type="checkbox" id="x_'+art.id+'_'+feat.id+'">';
         
         const box = td.children[0];
         box.checked = art.hasFeature(feat);
         box.onclick = function() {
+            project.link( feat.id, art.id, !box.checked );
         };
+
+        console.log(td);
     };
 
-    function saveArtifact(art) {
-        const col = project.indexOf(art);
-        if (col === -1)
-            throw new Error('foo bared');
-        
-    };
-
-    function addFeature() {
-    };
 
 </script>
 </body>

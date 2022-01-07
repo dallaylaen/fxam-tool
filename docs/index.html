@@ -6,12 +6,14 @@
 <body>
 <div id="badarea"></div>
 <h1>FXAM</h1>
-<table id="matrix" border="1">
+<table border="1">
+    <tbody id="matrix">
     <tr id="arts">
-        <th><a href="#" onclick="return addArtifact()">add art...</a><br>
+        <th ><a href="#" onclick="return addArtifact()">add art...</a><br>
         <a href="#" onclick="return addFeature()">add feat...</a></th>
+        <th>(pad)</th>
     </tr>
-    <tbody id="feats">
+    <tr><th>(pad)</th><td>(pad)</td></tr>
     </tbody>
 </table>
 <script>
@@ -28,16 +30,16 @@ window.onerror = function(err) {
     const project = new Project;
 
     const table = document.getElementById('matrix');
-    const thead = document.getElementById('arts');
-    const rows  = document.getElementById('feats');
+    const artName = table.children[0];
+    const artCost = table.children[1];
 
     function addArtifact() {
         const art = project.addArtifact();
-        art.elem = document.createElement( 'th', {id:'art_'+art.id} );
-        thead.appendChild( art.elem );
-        const list = rows.children;
-        const feats = project.features.list();
-        for( let i=0; i<list.length; i++) {
+        const th = document.createElement( 'th', {id:'art_'+art.id} );
+        artName.appendChild( th );
+        const list = table.children;
+        for( let i=1; i<list.length; i++) {
+            console.log("appending td to ", list[i]);
             const cell = document.createElement('td', );
             list[i].appendChild(cell);
         }
@@ -46,41 +48,51 @@ window.onerror = function(err) {
 
     function addFeature() {
         const feat = project.addFeature();
-        feat.elem = document.createElement( 'tr', {id:'feat_'+feat.id} );
-        rows.appendChild( feat.elem );
-        feat.elem.appendChild(document.createElement('th'));
+        const row = document.createElement( 'tr', {id:'feat_'+feat.id} );
+        table.appendChild( row );
+        row.appendChild(document.createElement('th')); // name
+        row.appendChild(document.createElement('th')); // cost
 
         const arts = project.artifacts.list();
         for( let i=0; i<arts.length; i++) {
             const cell = document.createElement('td', );
-            feat.elem.appendChild(cell);
+            row.appendChild(cell);
         }
         updateFeature(feat);
     };
 
     function updateFeature(feat) {
         const n = project.indexOf(feat);
-        const th = rows.children[n].children[0];
+        const row = table.children[n+2];
 
-        th.innerHTML = feat.name;
+        row.children[0].innerHTML = feat.name;
+        row.children[1].innerHTML = feat.cost;
 
-        for( let m = 0; m<project.artifacts.length(); m++)
+        for( let m = 0; m<project.artifacts.length(); m++) {
+            showCost( m );
             showCell( m, n );
+        };
     };
 
     function updateArtifact(art) {
         const col = project.indexOf(art);
         if (col === -1)
             throw new Error('foo bared');
-        thead.children[col+1].innerHTML = art.name;
+        artName.children[col+2].innerHTML = art.name;
+        artCost.children[col+2].innerHTML = art.cost();
 
         for( let row = 0; row<project.features.length(); row++)
             showCell( col, row );
     };
 
+    function showCost(n) {
+        const art = project.artifacts.nth(n);
+        artCost.children[n+2].innerHTML = art.cost();
+    };
+
     function showCell(x, y) {
-        const row = rows.children[y];
-        const td = row.children[x+1]; // skip th
+        const row = table.children[y+2];
+        const td = row.children[x+2]; // skip th
         // TODO check it exists
 
         const art  = project.artifacts.nth(x);
@@ -88,14 +100,14 @@ window.onerror = function(err) {
 
         // TODO better
         td.innerHTML='<input type="checkbox" id="x_'+art.id+'_'+feat.id+'">';
-        
+
         const box = td.children[0];
         box.checked = art.hasFeature(feat);
         box.onclick = function() {
             project.link( feat.id, art.id, !box.checked );
+            showCost(x);
         };
 
-        console.log(td);
     };
 
 

@@ -59,7 +59,7 @@ window.onerror = function(err) {
             bSave.style.display = buttonDefault;
             content.contentEditable = true;
             content.onblur = save;
-            content.focus();
+            setCaret(content, content.innerText.length);
         };
         bSave.onclick = save;
         content.onkeydown = e => {
@@ -70,6 +70,16 @@ window.onerror = function(err) {
             };
         };
         return elem;
+    }
+
+    function setCaret(element, where) {
+        const range = document.createRange();
+        range.selectNodeContents(element, where);
+        range.collapse();
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        element.focus();
     }
 </script>
 <script src="js/fxam.js"></script>
@@ -100,6 +110,16 @@ window.onerror = function(err) {
         row.appendChild(document.createElement('th')); // name
         row.appendChild(document.createElement('th')); // cost
 
+        row.children[0].appendChild(editableSpan(text => { feat.name = text }));
+        row.children[1].appendChild(editableSpan(text => {
+            const cost = Number.parseFloat(text);
+            if (Number.isNaN(cost))
+                throw("not a number, reset");
+
+            feat.cost = cost;
+            showCost();
+        }));
+
         const arts = project.artifacts.list();
         for( let i=0; i<arts.length; i++) {
             const cell = document.createElement('td', );
@@ -112,8 +132,8 @@ window.onerror = function(err) {
         const n = project.indexOf(feat);
         const row = table.children[n+2];
 
-        row.children[0].innerHTML = feat.name;
-        row.children[1].innerHTML = feat.cost;
+        row.children[0].children[0].text( feat.name );
+        row.children[1].children[0].text( feat.cost );
 
         for( let m = 0; m<project.artifacts.length(); m++) {
             showCost( m );
@@ -132,9 +152,13 @@ window.onerror = function(err) {
             showCell( col, row );
     };
 
-    function showCost(n) {
-        const art = project.artifacts.nth(n);
-        artCost.children[n+2].innerHTML = art.cost();
+    function showCost(...which) {
+        if (which.length === 0)
+            which = [...Array(project.artifacts.length()).keys()];
+        for (let i in which) {
+            const art = project.artifacts.nth(which[i]);
+            artCost.children[which[i]+2].innerHTML = art.cost();
+        }
     };
 
     function showCell(x, y) {

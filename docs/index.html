@@ -25,6 +25,53 @@ window.onerror = function(err) {
     };
 }
 </script>
+<script>
+    function editableSpan(onChange, text='...') {
+        const elem = document.createElement('span');
+        const content = document.createElement('span');
+        const bEdit = document.createElement('button');
+        const bSave = document.createElement('button');
+        const buttonDefault = bSave.style.display;
+        bSave.style.display = 'none';
+        content.innerHTML = text;
+        elem.appendChild(content);
+        elem.appendChild(bEdit);
+        elem.appendChild(bSave);
+        elem.text = function(set) {
+            if (set === undefined) {
+                return content.innerText;
+            } else {
+                content.innerText = set;
+            };
+        };
+        bEdit.innerHTML = '✎';
+        bSave.innerHTML = '✔';
+        const save = function () {
+            onChange(content.innerText);
+            content.contentEditable = false;
+            bEdit.style.display = buttonDefault;
+            bSave.style.display = 'none';
+            content.onblur = undefined;
+        };
+        bEdit.onclick = function() {
+            // TODO restore old text
+            bEdit.style.display = 'none';
+            bSave.style.display = buttonDefault;
+            content.contentEditable = true;
+            content.onblur = save;
+            content.focus();
+        };
+        bSave.onclick = save;
+        content.onkeydown = e => {
+            if (e.which === 13) {
+                e.stopPropagation();
+                save();
+                return false;
+            };
+        };
+        return elem;
+    }
+</script>
 <script src="js/fxam.js"></script>
 <script>
     const project = new Project;
@@ -36,10 +83,10 @@ window.onerror = function(err) {
     function addArtifact() {
         const art = project.addArtifact();
         const th = document.createElement( 'th', {id:'art_'+art.id} );
+        th.appendChild( editableSpan(text => {art.name = text}) );
         artName.appendChild( th );
         const list = table.children;
         for( let i=1; i<list.length; i++) {
-            console.log("appending td to ", list[i]);
             const cell = document.createElement('td', );
             list[i].appendChild(cell);
         }
@@ -78,7 +125,7 @@ window.onerror = function(err) {
         const col = project.indexOf(art);
         if (col === -1)
             throw new Error('foo bared');
-        artName.children[col+2].innerHTML = art.name;
+        artName.children[col+2].children[0].text(art.name);
         artCost.children[col+2].innerHTML = art.cost();
 
         for( let row = 0; row<project.features.length(); row++)
